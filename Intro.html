@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>WebSocket Echo Client</title>
+</head>
+<body>
+<h2>WebSocket Echo Client</h2>
+<div id="output"></div>
+<script type="text/javascript">
+	function setup(){
+		output = document.getElementById("output");
+		ws = new WebSocket("ws://localhost:10086");
+		ws.onopen = function(e){
+			log("Connected");
+			sendMessage("Hello WebSocket!");
+		}
+
+		ws.onclose = function(e){
+			log("Disconnected: " + e.reason);
+		}
+
+		ws.onerror = function(e){
+			log("Error");
+		}
+
+		ws.onmessage = function(e){
+			log("Message received: " + e.data);
+			ws.close();
+		}
+	}
+
+	function sendMessage(msg){
+		ws.send(msg);
+		log(msg);
+	}
+
+	function log(s){
+		var p = document.createElement("p");
+		p.style.wordWrap = "break-word";
+		p.textContent = s;
+		output.appendChild(p)
+		console.log(s);
+	}
+	setup();
+</script>
+</body>
+</html>

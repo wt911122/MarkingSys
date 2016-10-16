@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>Mark</title>
+	<link rel="stylesheet" type="text/css" href="css/normalize.css">
+	<style type="text/css">
+		#list{
+			margin: 0;
+			display: block;
+			max-height: 100vh;
+			overflow-y: scroll;
+		}
+		#list > li{
+			cursor: pointer;
+		}
+		#list > li.active{
+			background-color: blue;
+			color: white;
+		}
+		#list > li.active.beltoff::before{
+			content: "!";
+		    display: inline-block;
+		    color: red;
+		    position: relative;
+		    left: -1em;
+		}
+		#list > li.focus,
+		#list > li:hover{
+			background-color: black;
+			color: white;
+		}
+
+		.container {
+			overflow: hidden;
+		  	padding-left: 200px;   /* LC width */
+		}
+		.container .column {
+		  	float: left;
+		  	position: relative;
+		}
+		.center {
+		 	width: 100%;
+		}
+		.left {
+			width: 200px;  /* LC width */
+			margin-left: -100%;
+			right: 200px; 
+		}
+
+		#imagepart > img.responsible{
+			width: 100%;
+			!width: auto;
+			visibility: visible;
+		}
+		#imagepart{
+			position: relative;
+		}
+		#imagepart > img{
+			visibility: hidden;
+		}
+		.box{
+			position: absolute;
+			border: 1px solid red;
+		}
+		.box > .label{
+			position: absolute;
+			display: block;
+			left: 0;
+			top: 0;
+			transform: translateY(-100%);
+			padding: 3px 6px;
+			font-size: 12px;
+			cursor: move;
+		}
+		.box.active{
+			border-style: dashed;
+		}
+		.frontlock{
+			border-color: red;
+		}
+		.frontlock > .label{
+			background-color: red;
+			color: white;
+		}
+
+		.backlock{
+			border-color: green;
+		}
+		.backlock > .label{
+			background-color: green;
+			color: black;
+		}
+
+		.frontend{
+			border-color: #f29f3f;
+		}		
+		.frontend > .label{
+			background-color: #f29f3f;
+			color: white;
+		}
+
+		.backend{
+			border-color: #726dd1;
+		}
+		.backend > .label{
+			background-color: #726dd1;
+			color: white;
+		}
+
+
+	</style>
+</head>
+<body>
+<div class="container">
+	<!--<div id="imagepart" class="column center">
+		
+	</div>
+	<div class="column leftPT">
+		<ul id="list">
+		</ul>
+	</div>
+-->
+	<div class="column center img-responsable">
+		<div id="classesDom">
+			<!--<label><input type="radio" name="drawmode" value="windshield" checked/>车窗</label>
+			<label><input type="radio" name="drawmode" value="people" />人</label>
+			<label><input id="beltstate" type="checkbox" name="belton">未系安全带</label>-->
+			<button id="save">保存</button>
+			<button id="sweep">清除</button>
+		</div>
+		<div id="imagepart" ></div>
+		<div id="canvas"></div>
+	</div>
+  	<div class="column left">
+  		<ul id="list">
+		</ul>
+  	</div>
+  	<script type="text/javascript" src="js/app-event.js"></script>
+  	<script type="text/javascript" src="js/app-websocket.js"></script>
+  	<script type="text/javascript" src="js/app-dom.js"></script>
+  	<script type="text/javascript" src="js/app-client.js"></script>
+</div>
+</body>
+</html>
