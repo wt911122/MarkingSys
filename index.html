@@ -14,16 +14,9 @@
 		#list > li{
 			cursor: pointer;
 		}
-		#list > li.active{
+		#list > li.highlight{
 			background-color: blue;
 			color: white;
-		}
-		#list > li.active.beltoff::before{
-			content: "!";
-		    display: inline-block;
-		    color: red;
-		    position: relative;
-		    left: -1em;
 		}
 		#list > li.focus,
 		#list > li:hover{
@@ -126,8 +119,8 @@
 			<!--<label><input type="radio" name="drawmode" value="windshield" checked/>车窗</label>
 			<label><input type="radio" name="drawmode" value="people" />人</label>
 			<label><input id="beltstate" type="checkbox" name="belton">未系安全带</label>-->
-			<button id="save">保存</button>
-			<button id="sweep">清除</button>
+			<button id="savebtn">保存</button>
+			<button id="sweepbtn">清除</button>
 		</div>
 		<div id="imagepart" ></div>
 		<div id="canvas"></div>
@@ -138,6 +131,7 @@
   	</div>
   	<script type="text/javascript" src="js/app-event.js"></script>
   	<script type="text/javascript" src="js/app-websocket.js"></script>
+  	<script type="text/javascript" src="js/app-cache.js"></script>
   	<script type="text/javascript" src="js/app-dom.js"></script>
   	<script type="text/javascript" src="js/app-client.js"></script>
 </div>

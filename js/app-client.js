@@ -9,7 +9,8 @@ var app = this.app || {};
 			document.getElementById("list"), 
 			document.getElementById("classesDom"),
 			document.getElementById("imagepart"),
-			document.getElementById("canvas"));
+			document.getElementById("savebtn"),
+			document.getElementById("sweepbtn"));
 	}
 	app.init();
 }).call(window, app);

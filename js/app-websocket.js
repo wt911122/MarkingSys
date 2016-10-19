@@ -5,7 +5,10 @@ var app = this.app || {};
 		var ws;
 		var Event = {
 			webSocketDidOpen: "webSocketDidOpen",
-			messageReceived: "messageReceived",
+			messageReceived: {
+				blob: "blob",
+				string: "string"
+			},
 			error: "error"
 		};
 		function log(msg){
@@ -25,12 +28,24 @@ var app = this.app || {};
 			}
 			ws.onmessage = function(e){
 				log("message came at: ");
-				var eventobj = self.createEvent(Event.messageReceived, {
-					data: e.data,
-					conn: ws
-				});
-				self.emit(Event.messageReceived, eventobj)
-			}
+				if(typeof e.data === "string"){
+					console.log(e.data);
+					var eventobj = self.createEvent(Event.messageReceived.string, {
+						data: JSON.parse(e.data),
+						conn: ws
+					});
+					self.emit(Event.messageReceived.string, eventobj)
+				}
+
+				if(e.data instanceof Blob){
+					var eventobj = self.createEvent(Event.messageReceived.blob, {
+						data: e.data,
+						conn: ws
+					});
+					self.emit(Event.messageReceived.blob, eventobj)
+				}
+
+							}
 			ws.onerror = function(e){
 				log("Error");
 				var eventobj = self.createEvent(Event.error, {

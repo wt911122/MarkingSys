@@ -1,8 +1,9 @@
 var http = require("http");
 var websocket = require("./websocket").websocket;
 const path = require("path");
-const MongoClient = require('mongodb').MongoClient;
+const mongodao = require("./mongoDao")
 const rootPath = path.dirname(process.env.PWD);
+const url = 'mongodb://localhost:27017/groundtruth';
 
 var fs = require('fs');
 var OPCODE = {
@@ -14,7 +15,8 @@ var OPCODE = {
 }
 var PROTOCOL_TRANS = {
 	REQUEST_FILE_LIST: 1,
-	REQUEST_A_PHOTO: 2
+	REQUEST_A_PHOTO: 2,
+	REQUEST_TO_SAVE_DATA: 3,
 }
 
 /*websocket.listen(10086, "localhost", function(connection){
@@ -67,6 +69,9 @@ function parseProtocol(opcode, data, conn){
 			case PROTOCOL_TRANS.REQUEST_A_PHOTO:
 				PhotoRequestHandler(conn, data);
 				break;
+			case PROTOCOL_TRANS.REQUEST_TO_SAVE_DATA:
+				DataSavingRequestHandler(conn, data);
+				break;
 		}
 	}
 }
@@ -91,7 +96,17 @@ function FileListRequestHandler(conn, prot){
 				});
 			}
 		});
-		conn.send(JSON.stringify(list));
+
+		mongodao.findAll(function(records){
+			records.forEach(function(item){
+				Object.defineProperty(list.markedfilelist, item.name, {
+					enumerable: true,
+					value: item.name
+				});
+			})
+			conn.send(JSON.stringify(list));
+		});
+		
 	});	
 }
 /**
@@ -99,13 +114,30 @@ function FileListRequestHandler(conn, prot){
 **/
 function PhotoRequestHandler(conn, data){
 	var imagePath = path.join(process.env.PWD, data.path);
-	fs.readFile(imagePath, function(err, data){
-		if(err){
-			console.log(err)
+	mongodao.select(data, function(record){
+		if(record){
+			var obj = {
+				protocol: PROTOCOL_TRANS.REQUEST_A_PHOTO,
+				name: record.name,
+				boxes: record.boxes
+			}
+			conn.send(JSON.stringify(obj));
 		}
-		conn.send(new Buffer(data));
 	});
 	
+}
+
+function DataSavingRequestHandler(conn, data){
+	delete data.protocol;
+	console.log("data to save: "+JSON.stringify(data));
+	mongodao.save(data, function(result){
+		console.log("handled data:"+result);
+		var data = {
+			protocol: PROTOCOL_TRANS.REQUEST_TO_SAVE_DATA,
+			data: result
+		}
+		conn.send(JSON.stringify(data));
+	});
 }
 
 function connect(req, res){
@@ -143,8 +175,7 @@ function checkPath(url, res){
 			console.log("image read end");
 			fs.close();
 		})
-	}
-	if(/\.css$/.test(url.pathname) || /\.js$/.test(url.pathname)){
+	}else if(/\.css$/.test(url.pathname) || /\.js$/.test(url.pathname)){
 
 	//	var currentPath = process.cwd();
 		var cssPath = path.join(rootPath, url.pathname);
@@ -157,5 +188,8 @@ function checkPath(url, res){
 	        'Content-Length': stat.size
 	    });
 		rr.pipe(res);
+	}else{
+		res.end("error uri");
 	}
+
 }
