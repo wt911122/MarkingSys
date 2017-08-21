@@ -5,6 +5,7 @@ const mongodao = require("./mongoDao")
 const rootPath = path.dirname(process.env.PWD);
 const url = 'mongodb://localhost:27017/groundtruth';
 
+
 var fs = require('fs');
 var OPCODE = {
 	TEXT: 1,
@@ -18,6 +19,7 @@ var PROTOCOL_TRANS = {
 	REQUEST_A_PHOTO: 2,
 	REQUEST_TO_SAVE_DATA: 3,
 }
+var conns = [];
 
 /*websocket.listen(10086, "localhost", function(connection){
 	
@@ -45,8 +47,9 @@ var server = http.createServer(function(request, response){
 server.on("upgrade", function(req, socket, upgradeHead){
 	var ws = new websocket(req, socket, upgradeHead);
 	connectionHandler(ws);
+	conns.push(ws);
 });
-server.listen(10086, "localhost");
+server.listen(10086);
 function connectionHandler(conn){
 	conn.on("data", function(opcode, data){
 		console.log("message opcode: "+ opcode + "，data:" + data)
@@ -54,6 +57,9 @@ function connectionHandler(conn){
 	});
 	conn.on("close", function(code, data){
 		console.log("connection closed: ", code, data);
+		var idx = conns.indexOf(conn);
+		console.log(idx);
+		conns.splice(idx, 1);
 	})
 }
 /**
@@ -84,12 +90,12 @@ function FileListRequestHandler(conn, prot){
 		filelist: [],
 		markedfilelist: {}
 	};
-	var sourcePath = '../source/'
+	var sourcePath = '../source/clipimg/left/'
 	fs.readdir(sourcePath, function(err, data){
 		data.forEach(function(string){
 			var path = sourcePath + string;
 			var stat = fs.statSync(path);
-			if(stat.size > 10000){
+			if(string !== ".DS_Store" && stat.size > 1000){
 				list.filelist.push({
 					title: string,
 					path: path 
@@ -136,7 +142,10 @@ function DataSavingRequestHandler(conn, data){
 			protocol: PROTOCOL_TRANS.REQUEST_TO_SAVE_DATA,
 			data: result
 		}
-		conn.send(JSON.stringify(data));
+		//conn.send(JSON.stringify(data));
+		conns.forEach(function(conn){
+			conn.send(JSON.stringify(data));
+		})
 	});
 }
 
@@ -146,7 +155,7 @@ function connect(req, res){
 	
 	//console.log(req);
 	fs.readFile('../index.html',function(err, data){
-
+		console.log(err)
 		var body = data;
 		res.writeHeader(200, {
 			'Content-Length': Buffer.byteLength(body),
@@ -168,6 +177,22 @@ function checkPath(url, res){
 
 		res.writeHead(200, {
 	        'Content-Type': 'image/jpeg',
+	        'Content-Length': stat.size
+	    });
+		rr.pipe(res);
+		rr.on('finish', function(){
+			console.log("image read end");
+			fs.close();
+		})
+	}else if(/\.png$/.test(url.pathname)){
+		var imagePath = path.join(rootPath, url.pathname);
+	//	console.log(imagePath);
+		var stat = fs.statSync(imagePath);
+	//	console.log(stat);
+		const rr = fs.createReadStream(imagePath);
+
+		res.writeHead(200, {
+	        'Content-Type': 'image/png',
 	        'Content-Length': stat.size
 	    });
 		rr.pipe(res);

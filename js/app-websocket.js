@@ -1,6 +1,7 @@
 var app = this.app || {};
 
 (function(app){
+	var firstInit = true;
 	app.websocket = (function(){
 		var ws;
 		var Event = {
@@ -14,8 +15,16 @@ var app = this.app || {};
 		function log(msg){
 			console.log(msg);
 		} 
-		var wrapper = function(wsUrl){
-			ws = new WebSocket(wsUrl);
+		function wrapper(wsUrl){
+			this.wsUrl = wsUrl;
+			console.log(this);
+			this.init();
+			//return this;
+		}
+		
+		wrapper.prototype = Object.create(app.Event);
+		wrapper.prototype.init = function(callback){
+			ws = new WebSocket(this.wsUrl);
 			var self = this;
 			ws.onopen = function(e){
 				log("connected at: ");
@@ -24,7 +33,10 @@ var app = this.app || {};
 					data: e,
 					conn: ws
 				});
-				self.emit(Event.webSocketDidOpen, eventobj)
+				if(firstInit)
+					self.emit(Event.webSocketDidOpen, eventobj)
+				firstInit = false;
+				if(callback) callback();
 			}
 			ws.onmessage = function(e){
 				log("message came at: ");
@@ -57,11 +69,16 @@ var app = this.app || {};
 			ws.onclose = function(e){
 				log("websocket closed");
 			}
-			//return this;
 		}
-		wrapper.prototype = Object.create(app.Event);
 		wrapper.prototype.send = function(data){
-			ws.send(data);
+			if(ws.readyState !== 1){
+				this.init(function(){
+					ws.send(data);
+				});
+			}else{
+				ws.send(data);
+			}
+			
 		}
 		/**
 			package{

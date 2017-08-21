@@ -2,7 +2,8 @@ var app = this.app || {};
 
 (function(app){
 	function getNum(str){
-		return +(/^[^\d]+(\d+)\.jpg$/.exec(str)[1]);
+		console.log(str);
+		return +(/^(\d+)\.jpg/.exec(str)[1])
 	}
 	var imageOringinalWidth = undefined,
 		imageOringinalHeight = undefined,
@@ -24,27 +25,9 @@ var app = this.app || {};
 			classes:[
 				{
 					name: "frontlock",
-					title: "前锁孔",
+					title: "锁孔",
 					ratio: 1,
 					nowWidth: 20,
-				},
-				{
-					name: "backlock",
-					title: "后锁孔",
-					ratio: 1,
-					nowWidth: 20,
-				},
-				{
-					name: "frontend",
-					title: "前端",
-					ratio: 3.5,
-					nowWidth: 60,
-				},
-				{
-					name: "backend",
-					title: "后端",
-					ratio: 3.5,
-					nowWidth: 60,
 				}
 			]
 		},
@@ -66,6 +49,7 @@ var app = this.app || {};
 			this._initBtnFunction();
 			this._initMessageResolvor();
 			this._initBoxResolver();
+			this._initKeyDownListener();
 		},
 		_initClassesDom: function(){
 			var classes = this.configure.classes;
@@ -360,6 +344,31 @@ var app = this.app || {};
 				state.activeBox.style.left = state.lastbound.left - bound2.left+vector.x + 'px';
 				state.activeBox.style.top = state.lastbound.top - bound2.top+vector.y + 'px';
 			}
+		},
+		_initKeyDownListener: function(){
+			var self = this;
+			document.addEventListener('keydown', function(event){
+				var state = self.state;
+				if(state.activeBox){
+					var mode = self.getClassChosen();
+					switch(event.key){
+						case 'ArrowUp':
+							event.preventDefault();
+							mode.nowWidth+=3;
+							break;
+						case 'ArrowDown':
+							event.preventDefault();
+							mode.nowWidth-=3;
+							break;
+					}
+					console.log(mode.nowWidth, mode.nowWidth / mode.ratio);
+					var bound = state.activeBox.getBoundingClientRect();
+					//var bound2= imageDom.getBoundingClientRect();
+
+					state.activeBox.style.width = mode.nowWidth + 'px';
+					state.activeBox.style.height = mode.nowWidth / mode.ratio + 'px';
+				}
+			});
 		}
 	}
 }).call(window, app);

@@ -1,7 +1,7 @@
 var app = this.app || {};
 
 (function(app){
-	const wsUrl = "ws://localhost:10086";
+	const wsUrl = "ws://10.1.1.168:10086";
 	console.log(app);
 	app.init = function(){
 		app.websocket.init(wsUrl);
