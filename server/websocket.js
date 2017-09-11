@@ -13,6 +13,7 @@ var OPCODE = {
 
 var websocketConnection = function(req, socket, upgradeHead){
 	var self = this;
+	console.log(`request ${req.headers["sec-websocket-protocol"]} ${req.headers["sec-websocket-key"]}`)
 	console.log(req.headers["sec-websocket-protocol"]);
 	var key = computeKey(req.headers["sec-websocket-key"]);
 	socket.write(
@@ -46,7 +47,7 @@ websocketConnection.prototype.send = function(obj){
 		opcode = OPCODE.BINARY;
 		payload = obj;
 	}else if(typeof obj == "string"){
-		console.log("send:" + obj);
+		//console.log("send:" + obj);
 		opcode = OPCODE.TEXT;
 		payload = new Buffer(obj, 'utf8');
 	}else{
@@ -191,7 +192,7 @@ function unmask(mask_byte, buffer){
 	}
 	return payload;
 }
-
+//UGXst0TqW1WbisMRgUfJ+Q==258EAFA5-E914-47DA-95CA-C5AB0DC85B11
 function computeKey(key){
 	var KEY_SUFFIX = "258EAFA5-E914-47DA-95CA-C5AB0DC85B11";
 	var sha1 = crypto.createHash("sha1");

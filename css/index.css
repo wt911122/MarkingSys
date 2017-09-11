@@ -1,0 +1,169 @@
+#list{
+  margin: 0;
+  padding: 0;
+  display: block;
+  max-height: 100vh;
+  overflow-y: scroll;
+  list-style: none;
+}
+#list > li{
+  padding: 2px 10px;
+  line-height: 1.2em;
+  cursor: pointer;
+}
+#list > li.highlight{
+  background-color: #044d22;
+  color: white;
+}
+#list > li.highlight:hover{
+  text-decoration: none;
+  background-color: #ff9500;
+}
+#list > li:hover{
+  text-decoration: underline;
+}
+#list > li.focus:before{
+  content: "\2192"
+}
+
+.container {
+  overflow: hidden;
+    padding-left: 200px;   /* LC width */
+}
+.container .column {
+    float: left;
+    position: relative;
+}
+.center {
+  width: 100%;
+}
+.left {
+  width: 200px;  /* LC width */
+  margin-left: -100%;
+  right: 200px; 
+}
+
+#markzone > img.responsible{
+  width: 100%;
+  !width: auto;
+  visibility: visible;
+}
+#markzone{
+  position: relative;
+  -moz-user-select: none; 
+  -webkit-user-select: none; 
+  -ms-user-select: none; 
+  -khtml-user-select: none; 
+  user-select: none; 
+}
+#markzone > img{
+  visibility: hidden;
+}
+.box{
+  position: absolute;
+  border: 1px solid red;
+}
+.box > .label{
+  position: absolute;
+  display: block;
+    left: -1px;
+    top: -1px;
+  transform: translateY(-100%);
+  padding: 3px 6px;
+  font-size: 12px;
+  cursor: move;
+}
+.box > .control-point{
+  position: absolute;
+  display: block;
+  width: 20px;
+  height: 20px;
+  background-color: orange;
+  border-radius: 100%;
+  transform: translate(-50%, -50%);
+  left: 100%;
+  top: 100%;
+  cursor: move;
+}
+.box.active{
+  border-style: dashed;
+}
+.frontlock{
+  border-color: red;
+}
+.frontlock > .label{
+  background-color: red;
+  color: white;
+}
+
+.backlock{
+  border-color: green;
+}
+.backlock > .label{
+  background-color: green;
+  color: black;
+}
+
+.frontend{
+  border-color: #f29f3f;
+}   
+.frontend > .label{
+  background-color: #f29f3f;
+  color: white;
+}
+
+.backend{
+  border-color: #726dd1;
+}
+.backend > .label{
+  background-color: #726dd1;
+  color: white;
+}
+.hidden{
+  display: none;
+}
+.cover{
+  position: absolute;
+  left: 0;
+  top: 0;
+  background-color: rgba(0, 0, 0, 0.35);
+  width: 100%;
+  height: 100%;
+}
+#modal,
+#modal-schema{
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+}
+.modal{
+  position: absolute;
+  padding: 10px;
+  left: 50%;
+  top: 50%;
+  width: 500px;
+  height: 240px;
+  transform: translate(-50%, -50%);
+  background-color: #fff;
+  border-radius: 10px;
+}
+.modal > div + div{
+  margin-top: 10px;
+}
+.btn-download{
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 50px;
+  line-height: 50px;
+  font-size: 24px;
+  background-color: #24292e;
+  color: #fff;
+  border: 0;
+  border-bottom-left-radius: 10px;
+  border-bottom-right-radius: 10px;
+  cursor: pointer;
+}

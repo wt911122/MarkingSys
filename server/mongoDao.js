@@ -1,50 +1,27 @@
 const assert = require("assert");
 const MongoClient = require('mongodb').MongoClient;
-const url = 'mongodb://localhost:27017/groundtruth';
-const COLLECTION = 'sample1'
+const url = 'mongodb://localhost:27017/zjutdb';
+const COLLECTION = 'samples';
 
 var MongoDao = {
-
-	save: function(data, callback){
+	findAll: function(filteroptions = {}, callback){
+		var self = this;
 		MongoClient.connect(url, function(err, db) {
 			assert.equal(null, err);
-			var col = db.collection(COLLECTION);
-			col.findOneAndUpdate(
-				{name: data.name},
-				{$set: {boxes: data.boxes}},
-				{
-					upsert: true,
-					returnOriginal:false
-				},
-				function(err, result){
-					assert.equal(null, err);
-					db.close();
-					console.log(JSON.stringify(result));
-					callback({
-						name: result.value.name,
-						boxes: result.value.boxes
-					});
-				}
-			);
-		});
-	},
-	findAll: function(callback){
-		MongoClient.connect(url, function(err, db) {
-			assert.equal(null, err);
-			var col = db.collection(COLLECTION);
-			col.find().toArray(function(err, docs){
+			var col = db.collection(self.collection);
+			col.find(filteroptions).toArray(function(err, docs){
 				assert.equal(null, err);
 				db.close();
 				callback(docs);
 			})
 		});
 	},
-	select: function(data, callback){
-		console.log(data.title);
+	select: function(filteroptions = {}, callback){
+		var self = this;
 		MongoClient.connect(url, function(err, db) {
 			assert.equal(null, err);
-			var col = db.collection(COLLECTION);
-			col.findOne({name: data.title}, {}, function(err, docs){
+			var col = db.collection(self.collection);
+			col.findOne(filteroptions, {}, function(err, docs){
 				assert.equal(null, err);
 				db.close();
 				//console.log(docs);
@@ -53,4 +30,64 @@ var MongoDao = {
 		});
 	}
 }
-module.exports = MongoDao;
+
+var tagDao = Object.create(MongoDao);
+tagDao.collection = "tags";
+
+var objectsDao = Object.create(MongoDao);
+objectsDao.collection = "objects";
+
+var schemasDao = Object.create(MongoDao);
+schemasDao.collection = "schemas";
+
+schemasDao.save = function(data, callback) {
+	var self = this;
+	MongoClient.connect(url, function(err, db) {
+		assert.equal(null, err);
+		var col = db.collection(self.collection);
+ 		col.insertOne(data).then(callback);
+	});
+}
+
+
+var samplesDao = Object.create(MongoDao);
+samplesDao.collection = "samples";
+
+samplesDao.save = function(filter, data, callback){
+	var self = this;
+	MongoClient.connect(url, function(err, db) {
+		assert.equal(null, err);
+		var col = db.collection(self.collection);
+		col.deleteMany(filter).then((result)=>{
+			if(data.length > 0){
+				return col.insertMany(data)
+			}else{
+				return 'empty';
+			}
+		}).then(callback);
+		/*col.findOneAndUpdate(
+			{name: data.name},
+			{$set: {boxes: data.boxes}},
+			{
+				upsert: true,
+				returnOriginal:false
+			},
+			function(err, result){
+				assert.equal(null, err);
+				db.close();
+				console.log(JSON.stringify(result));
+				callback({
+					name: result.value.name,
+					boxes: result.value.boxes
+				});
+			}
+		);*/
+	});
+},
+
+module.exports = {
+	tagDao,
+	objectsDao,
+	samplesDao,
+	schemasDao
+}

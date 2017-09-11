@@ -4,105 +4,7 @@
 	<meta charset="utf-8">
 	<title>Mark</title>
 	<link rel="stylesheet" type="text/css" href="css/normalize.css">
-	<style type="text/css">
-		#list{
-			margin: 0;
-			display: block;
-			max-height: 100vh;
-			overflow-y: scroll;
-		}
-		#list > li{
-			cursor: pointer;
-		}
-		#list > li.highlight{
-			background-color: blue;
-			color: white;
-		}
-		#list > li.focus,
-		#list > li:hover{
-			background-color: black;
-			color: white;
-		}
-
-		.container {
-			overflow: hidden;
-		  	padding-left: 200px;   /* LC width */
-		}
-		.container .column {
-		  	float: left;
-		  	position: relative;
-		}
-		.center {
-		 	width: 100%;
-		}
-		.left {
-			width: 200px;  /* LC width */
-			margin-left: -100%;
-			right: 200px; 
-		}
-
-		#imagepart > img.responsible{
-			width: 100%;
-			!width: auto;
-			visibility: visible;
-		}
-		#imagepart{
-			position: relative;
-		}
-		#imagepart > img{
-			visibility: hidden;
-		}
-		.box{
-			position: absolute;
-			border: 1px solid red;
-		}
-		.box > .label{
-			position: absolute;
-			display: block;
-			left: 0;
-			top: 0;
-			transform: translateY(-100%);
-			padding: 3px 6px;
-			font-size: 12px;
-			cursor: move;
-		}
-		.box.active{
-			border-style: dashed;
-		}
-		.frontlock{
-			border-color: red;
-		}
-		.frontlock > .label{
-			background-color: red;
-			color: white;
-		}
-
-		.backlock{
-			border-color: green;
-		}
-		.backlock > .label{
-			background-color: green;
-			color: black;
-		}
-
-		.frontend{
-			border-color: #f29f3f;
-		}		
-		.frontend > .label{
-			background-color: #f29f3f;
-			color: white;
-		}
-
-		.backend{
-			border-color: #726dd1;
-		}
-		.backend > .label{
-			background-color: #726dd1;
-			color: white;
-		}
-
-
-	</style>
+	<link rel="stylesheet" type="text/css" href="css/index.css">
 </head>
 <body>
 <div class="container">
@@ -119,21 +21,87 @@
 			<!--<label><input type="radio" name="drawmode" value="windshield" checked/>车窗</label>
 			<label><input type="radio" name="drawmode" value="people" />人</label>
 			<label><input id="beltstate" type="checkbox" name="belton">未系安全带</label>-->
-			<button id="savebtn">保存</button>
-			<button id="sweepbtn">清除</button>
+			<button class="btn" id="savebtn">保存</button>
+			<button class="btn" id="sweepbtn">清除</button>
+			<button class="btn" id="downloadBtn">下载</button>
+			<select id="taglist"></select>
+			<select id="strategyList">
+				<option>方案一</option>
+				<option>方案二</option>
+				<option>方案三</option>
+			</select>
+			<button class="btn" id="newSchemaBtn">新建方案</button>
+			<div id="objectlist"></div>
 		</div>
-		<div id="imagepart" ></div>
+		<div id="markzone" ></div>
 		<div id="canvas"></div>
 	</div>
-  	<div class="column left">
-  		<ul id="list">
+	<div class="column left">
+		<div>
+			文件夹：
+			<select id="folders">
+				<option value="" selected>请选择</option>
+			</select>
+		</div>
+		<ul id="list">
 		</ul>
-  	</div>
-  	<script type="text/javascript" src="js/app-event.js"></script>
-  	<script type="text/javascript" src="js/app-websocket.js"></script>
-  	<script type="text/javascript" src="js/app-cache.js"></script>
-  	<script type="text/javascript" src="js/app-dom.js"></script>
-  	<script type="text/javascript" src="js/app-client.js"></script>
+	</div>
+	<div id="modal">
+		<div class="cover"></div>
+		<div class="modal">
+			<div class="filter-list">
+				文件夹：
+				<span class="folder-mod"></span>
+				组别：
+				<span class="tag-mod"></span>
+				方案：
+				<span class="schema-mod"></span>
+				类型：
+				<div class="object-mod"></div>
+			</div>
+			<div class="option-list">
+				<label>
+					形式
+					<select id="formats">
+						<option value="zip" selected>图片压缩包</option>
+						<option value="text">文本文件</option>
+					</select>
+				</label>
+			</div>
+			<button class="btn btn-download">下载</button>
+		</div>
+	</div>
 </div>
+<div id="modal-schema">
+	<div class="cover"></div>
+	<div class="modal">
+		<div>类型：<span class="schema-tag"></span></div>
+		<div>
+			<label>方案名：</label>
+			<input type="text" class="schema-name" name="schema-name">
+		</div>
+		<div>
+			<label>方案简介：</label><br>
+			<textarea class="schema-brief" name="schema-brief"></textarea> 
+		</div>
+		<div>
+			<label>继承自：</label>
+			<select class="schema-base" name="schema-base">
+				<option>方案一</option>
+				<option>方案二</option>
+				<option>方案三</option>
+			</select>
+		</div>
+		<button class="btn btn-download">新建+</button>
+	</div>
+</div>
+<script type="text/javascript" src="js/app-event.js"></script>
+<script type="text/javascript" src="js/app-websocket.js"></script>
+<script type="text/javascript" src="js/app-cache.js"></script>
+<script type="text/javascript" src="js/app-dom.js"></script>
+<script type="text/javascript" src="js/app-download.js"></script>
+<script type="text/javascript" src="js/app-schema.js"></script>
+<script type="text/javascript" src="js/app-mark.js"></script>
+<script type="text/javascript" src="js/app-client.js"></script>
 </body>
 </html>

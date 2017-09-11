@@ -17,7 +17,7 @@ var app = this.app || {};
 		} 
 		function wrapper(wsUrl){
 			this.wsUrl = wsUrl;
-			console.log(this);
+			//console.log(this);
 			this.init();
 			//return this;
 		}
@@ -41,7 +41,7 @@ var app = this.app || {};
 			ws.onmessage = function(e){
 				log("message came at: ");
 				if(typeof e.data === "string"){
-					console.log(e.data);
+					// console.log(e.data);
 					var eventobj = self.createEvent(Event.messageReceived.string, {
 						data: JSON.parse(e.data),
 						conn: ws
