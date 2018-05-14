@@ -98,3 +98,20 @@ var app = window.app || {};
 
   app.downloadModal = modal;
 }).call(window, app);
+
+(function(app){
+  const dom = document.getElementById("messageBox");
+  function visible(msg){
+    dom.innerText = msg;
+    dom.classList.add("visible");
+  }
+  function invisible(){
+    dom.classList.remove("visible");
+  }
+  app.messageBox = {
+    toggle: function(msg){
+      visible(msg);
+      setTimeout(invisible, 1000);
+    }
+  }
+}).call(window, app);

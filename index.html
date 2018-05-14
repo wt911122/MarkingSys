@@ -23,6 +23,7 @@
 			<label><input id="beltstate" type="checkbox" name="belton">未系安全带</label>-->
 			<button class="btn" id="savebtn">保存</button>
 			<button class="btn" id="sweepbtn">清除</button>
+			<button class="btn" id="deletebtn">删除</button>
 			<button class="btn" id="downloadBtn">下载</button>
 			<select id="taglist"></select>
 			<select id="strategyList">
@@ -65,6 +66,7 @@
 					<select id="formats">
 						<option value="zip" selected>图片压缩包</option>
 						<option value="text">文本文件</option>
+						<option value="onetxteachpic">每张图片一个txt</option>
 					</select>
 				</label>
 			</div>
@@ -94,6 +96,9 @@
 		</div>
 		<button class="btn btn-download">新建+</button>
 	</div>
+</div>
+<div id="messageBox" class="messageBox">
+	
 </div>
 <script type="text/javascript" src="js/app-event.js"></script>
 <script type="text/javascript" src="js/app-websocket.js"></script>

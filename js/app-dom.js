@@ -37,6 +37,7 @@ var app = this.app || {};
 		imageContainerDom: undefined,
 		saveBtn: undefined,
 		sweepBtn: undefined,
+		deleteBtn: undefined,
 		classesChild: [],
 		schemasChild: [],
 		configure:{
@@ -59,7 +60,8 @@ var app = this.app || {};
 			saveBtn, 
 			sweepBtn, 
 			downloadBtn,
-			newSchemaBtn
+			newSchemaBtn,
+			deleteBtn
 		}){
 			this.fileListDom = fileListDom;
 			this.tagListDom = tagListDom;
@@ -70,6 +72,7 @@ var app = this.app || {};
 			this.imageContainerDom = imagepart;
 			this.saveBtn = saveBtn;
 			this.sweepBtn = sweepBtn;
+			this.deleteBtn = deleteBtn;
 			this.downloadBtn = downloadBtn;
 			this.newSchemaBtn = newSchemaBtn;
 			// this._initClassesDom();
@@ -133,40 +136,43 @@ var app = this.app || {};
 			}
 			app.mark.clear();
 		},
+		_save: function(){
+			console.log("save");
+			var ws = app.websocket;
+			// var boxes = app.cache.getCache();
+			var bound = this.imageContainerDom.getBoundingClientRect();
+			console.log(this.activeSample);
+			var data = {
+				protocol: 3,
+				boxes: app.mark.exportBoxes(),
+				name: this.activeSample.item.title,
+				path: this.activeSample.item.path,
+				tag: this.getClassChosen().tag,
+				schema: this.strategyListDom.value,
+			}
+			console.log(data);
+			/*for(var idx in boxes){
+				if(boxes.hasOwnProperty(idx)){
+					var bd = boxes[idx].box.getBoundingClientRect();
+					data.boxes.push({
+						type: boxes[idx].type,
+						x: (bd.left - bound.left) * imageScale,
+						y: (bd.top - bound.top) * imageScale,
+						width: bd.width * imageScale,
+						height: bd.height * imageScale
+					});
+				}
+			}*/
+
+			//console.log(data)
+			ws.send(JSON.stringify(data));
+		},	
 		_initBtnFunction: function(){
 			var self = this;
 			this.sweepBtn.onclick = this._clearImageContainer.bind(this);
 
 			this.saveBtn.onclick = function(){
-				console.log("save");
-				var ws = app.websocket;
-				// var boxes = app.cache.getCache();
-				var bound = self.imageContainerDom.getBoundingClientRect();
-				console.log(self.activeSample);
-				var data = {
-					protocol: 3,
-					boxes: app.mark.exportBoxes(),
-					name: self.activeSample.item.title,
-					path: self.activeSample.item.path,
-					tag: self.getClassChosen().tag,
-					schema: self.strategyListDom.value,
-				}
-				console.log(data);
-				/*for(var idx in boxes){
-					if(boxes.hasOwnProperty(idx)){
-						var bd = boxes[idx].box.getBoundingClientRect();
-						data.boxes.push({
-							type: boxes[idx].type,
-							x: (bd.left - bound.left) * imageScale,
-							y: (bd.top - bound.top) * imageScale,
-							width: bd.width * imageScale,
-							height: bd.height * imageScale
-						});
-					}
-				}*/
-
-				//console.log(data)
-				ws.send(JSON.stringify(data));
+					self._save();
 			}
 			this.downloadBtn.onclick = function(){
 				// Todo  下载接口
@@ -184,6 +190,20 @@ var app = this.app || {};
 				var val = selected.tag;
 				app.schemaModel.createSchemaOption(self.configure.classes.find((item) => (item.tag === val)));
 			}
+
+			this.deleteBtn.onclick = function(){
+				app.mark.deleteChosen();
+			}
+
+			document.addEventListener("keydown", function(e){
+		    var currKey=0, e=e||event||window.event;  
+		    currKey = e.keyCode||e.which||e.charCode;  
+		    if(currKey == 83){ 
+		    		e.preventDefault();   
+		        self.saveBtn.click();  
+		        return false;  
+		    } 
+			})
 		},
 		_initMessageResolvor: function(){
 			var ws = app.websocket;
@@ -193,6 +213,7 @@ var app = this.app || {};
 				if(e.data.protocol === 3){
 					// PROTOCOL_TRANS.REQUEST_TO_SAVE_DATA
 					//console.log(e.data.data.name);
+					app.messageBox.toggle("保存成功！")
 					console.log(e.data.data);
 					if(e.data.data.folder === selected.folder){
 						if(e.data.data.empty){
@@ -572,7 +593,7 @@ var app = this.app || {};
 						case 'ArrowDown':
 							event.preventDefault();
 							mode.width -= 3;
-							break;
+							break; 
 					}
 					mode.height = mode.width / mode.ratio;
 					console.log(mode.width, mode.width / mode.ratio);

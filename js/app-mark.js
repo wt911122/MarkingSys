@@ -33,6 +33,12 @@ var app = window.app || {};
   markZone.clear = function(){
     boxes = [];
   }
+  markZone.deleteChosen = function(){
+    if(chosen.dom){
+      chosen.dom.remove();
+      boxes.splice(chosen.idx, 1);
+    }
+  }
 
   markZone.exportBoxes = function(){
     const {
@@ -91,6 +97,7 @@ var app = window.app || {};
       tag,
       schema,
     } = _getClassChosen();
+    console.log(tag, schema);
     const {
       scale
     } = img;
@@ -108,27 +115,29 @@ var app = window.app || {};
       object: object.object,
       color: object.color
     }
-    const dom = _createBoxDOM(data);
+    const dom = _createBoxDOM(data, boxes.length);
     boxes.push({
       dom: dom,
       data: data
     });
-    _setChosen(dom, data);
+    _setChosen(dom, data, boxes.length-1);
   }
 
-  function _setChosen(dom, data){
+  function _setChosen(dom, data, idx){
     if(chosen.dom){
       chosen.dom.classList.remove('active');
     }
     chosen.dom = dom;
     chosen.dom.classList.add('active');
     chosen.data = data;
+    chosen.idx = idx;
   }
 
   function _mouseMoveHandler(e){
     e.preventDefault();
     if(!mouseDown) return;
     const {x, y} = _getRealAxis(e);
+    
     if(mouseDown.name === "label"){
       //console.log(mouseDown);
       const vecX = x - mouseDown.initialDownPos.x;
@@ -151,6 +160,7 @@ var app = window.app || {};
         width,
         height,
       } = mouseDown.data;*/
+      //console.log(mouseDown);
       const vecX = x - mouseDown.initialDownPos.x;
       const vecY = y - mouseDown.initialDownPos.y;
       let newX, newY, newW, newH;
@@ -194,10 +204,11 @@ var app = window.app || {};
       y:e.pageY - bound.top
     }
   }
-  function _createBoxDOM(data){
+  function _createBoxDOM(data, idx){
     var div = document.createElement("div");
     //console.log(data);
     div.classList.add("box");
+    if(data.tag==='行人')div.classList.add("pedestrians")
     div.style.left = data.x + 'px';
     div.style.top = data.y+ 'px';
     div.style.width = data.width+ 'px';
@@ -217,7 +228,7 @@ var app = window.app || {};
         newX: data.x,
         newY: data.y
       }
-      _setChosen(div, data);
+      _setChosen(div, data, idx);
     });
     label.addEventListener('mouseup', function(e){
       e.stopPropagation();
@@ -245,13 +256,16 @@ var app = window.app || {};
         newW: data.width,
         newH: data.height
       }
-      _setChosen(div, data);
+      console.log(mouseDown.newW);
+      _setChosen(div, data, idx);
     });
 
-    scalePoint.addEventListener('mouseup', function(e){
+    zone.dom.addEventListener('mouseup', function(e){
       e.stopPropagation();
       e.preventDefault();
-      //console.log("mouseup")
+      if(!mouseDown) return;
+      console.log(mouseDown.newW);
+      let data = mouseDown.data;
       data.width = mouseDown.newW;
       data.height = mouseDown.newH;
       data.x = mouseDown.newX;

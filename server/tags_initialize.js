@@ -3,6 +3,10 @@ db.tags.insertMany([
    { tag: "车型", width: "128", height: "128" },
 ]);
 
+db.tags.insert({ tag: "行人", width: "100", height: "40" });
+
+
+
 db.objects.insertMany([
    { object: "黄", tag: "车牌颜色", color: "#FFFF00", },
    { object: "蓝", tag: "车牌颜色", color: "#0000FF", },
@@ -19,7 +23,14 @@ db.objects.insertMany([
    { object: "三轮车", tag: "车型", color: "#6a1bb1", },
 ]);
 
+db.objects.insertMany([
+   { object: "人", tag: "行人", color: "#FFFF00" }
+]);
+
 db.schemas.insertMany([
    { schema: "default", tag: "车牌颜色", brief: "默认方案", time: new Date(), base: null},
    { schema: "default", tag: "车型", brief: "默认方案", time: new Date(), base: null},
+]);
+db.schemas.insertMany([
+   { schema: "default", tag: "行人", brief: "默认方案", time: new Date(), base: null},
 ]);

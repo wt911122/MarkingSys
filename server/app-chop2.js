@@ -1,5 +1,5 @@
 const fs = require('fs');
-const { samplesDao } = require("./mongoDao");
+const { samplesDao, DefaultDao } = require("./mongoDao");
 const os = require("os");
 const path = require("path");
 const easyimg = require('easyimage');
@@ -229,9 +229,88 @@ function RecordAndZip(filter, callback){
 
 }
 
+
+function RecordAllToTextAndZip(callback){
+	var base = Date.now();
+	var path = `${rootPath}/temp/${base}-samples.zip`;
+	var dstpath = `${rootPath}/temp/${base}`;
+	var output = fs.createWriteStream(path);
+	var archive = archiver('zip', {
+	    zlib: { level: 9 } // Sets the compression level. 
+	});
+	output.on('close', function() {
+	  console.log(archive.pointer() + ' total bytes');
+	  console.log('archiver has been finalized and the output file descriptor has closed.');
+	  deleteall(dstpath);
+	  callback(path);
+	});
+	// good practice to catch warnings (ie stat failures and other non-blocking errors) 
+	archive.on('warning', function(err) {
+	  if (err.code === 'ENOENT') {
+	      // log warning 
+	  } else {
+	      // throw error 
+	      throw err;
+	  }
+	});
+
+		// good practice to catch this error explicitly 
+	archive.on('error', function(err) {
+	  throw err;
+	});
+	archive.pipe(output);
+	fs.mkdirSync(dstpath);
+
+	//db.samples.aggregate([{$group: {_id:"$name", features:{$push:{type:"$type",x:"$x"}}}}])
+
+	DefaultDao("samples")
+		.then((collection) => {
+				collection.aggregate(
+					[
+						{
+							$group: {
+								_id:"$name",
+								features:{
+									$push:{
+										type:"$type",
+										x:"$x",
+										y:"$y",
+										width:"$width",
+										height:"$height",
+									}
+								}
+							}
+						}
+					], function(err, result){
+
+						Promise.all(result.map((k) => {
+							//console.log(k);
+							const text_path = `${dstpath}/${k._id}.txt`;
+							const f = k.features;
+
+							const content = f.map((c) => (`${c.type} ${c.x} ${c.y} ${c.width} ${c.height}`)).join('\r\n');
+							return new Promise((resolve, reject) => {
+								fs.writeFile(text_path, content, (err) => {
+									if(err) {
+										console.log(err);
+										reject(err);
+									}
+									else resolve('ok');
+								})
+							})
+						})).then(function(){
+							//console.log(`${rootPath}/source/output/`);
+							return archive.directory(dstpath, 'samples').finalize();
+						}, (err) => {
+							console.log(err);
+						})
+					});
+		})
+}
 module.exports = {
 	CropAndZip,
-	RecordAndZip
+	RecordAndZip,
+	RecordAllToTextAndZip
 }
 
 					//for(let i = 0; i < 3; i++){

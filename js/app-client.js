@@ -14,6 +14,7 @@ var app = this.app || {};
 			imagepart: document.getElementById("markzone"), 
 			saveBtn: document.getElementById("savebtn"), 
 			sweepBtn: document.getElementById("sweepbtn"), 
+			deleteBtn: document.getElementById("deletebtn"),
 			downloadBtn: document.getElementById("downloadBtn"),
 			newSchemaBtn: document.getElementById("newSchemaBtn"),
 		});

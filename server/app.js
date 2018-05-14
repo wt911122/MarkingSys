@@ -9,7 +9,8 @@ const {
 } = require("./mongoDao");
 const {	
 	CropAndZip,
-	RecordAndZip
+	RecordAndZip,
+	RecordAllToTextAndZip
 } = require('./app-chop2');
 
 
@@ -215,6 +216,7 @@ function FileListRequestHandler(conn, data){
 		tag = data.tag;
 		schema = data.schema;
 	}
+	console.log(sourcePath);
 	fs.readdir(sourcePath, function(err, data){
 		console.log(data);
 		data.forEach(function(string){
@@ -519,6 +521,8 @@ function download(url, res){
 		case 'zip':
 			CropAndZip(filter, transportZIP)
 		break;
+		case 'onetxteachpic':
+			RecordAllToTextAndZip(transportZIP)
 	}
 	/*CropAndZip(query, function(path){
 		console.log(`${path} zipped`);

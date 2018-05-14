@@ -83,11 +83,24 @@ samplesDao.save = function(filter, data, callback){
 			}
 		);*/
 	});
-},
+}
+
+var DefaultDao = function(collect){
+	return new Promise((resolve, reject) => {
+		MongoClient.connect(url, function(err, db){
+			assert.equal(null, err);
+			var col= db.collection(collect);
+			resolve(col);
+		})
+	});
+	
+}
+
 
 module.exports = {
 	tagDao,
 	objectsDao,
 	samplesDao,
-	schemasDao
+	schemasDao,
+	DefaultDao
 }
